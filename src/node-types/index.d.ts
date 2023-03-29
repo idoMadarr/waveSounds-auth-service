@@ -1,12 +1,13 @@
-export interface DecodedPayload {
+interface DecodedPayload {
   id: string;
   email: string;
 }
 
-declare global {
+export declare global {
   namespace Express {
     interface Request {
-      currentUser?: DecodedPayload;
+      session: { userJwt: any };
+      currentUser: DecodedPayload;
     }
   }
 }

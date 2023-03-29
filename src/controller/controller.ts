@@ -1,7 +1,8 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, Request, Response } from 'express';
 import { sign, JwtPayload } from 'jsonwebtoken';
 import { BadRequestError } from '../errors/bad-request-error';
 import { User } from '../models/User';
+import { Favorite } from '../models/Favorite';
 
 export const signUp: RequestHandler = async (req, res, _next) => {
   const { email, username, password } = req.body;
@@ -15,13 +16,14 @@ export const signUp: RequestHandler = async (req, res, _next) => {
   const hashingPassword = await User.toHash(password);
   const createUser = User.build({ email, username, password: hashingPassword });
   await createUser.save();
+  Favorite.buildRepo(createUser.id);
 
   const payload: JwtPayload = {
     id: createUser.id,
     email: createUser.email,
-    username: createUser.username,
   };
   const userJwt = sign(payload, process.env.JWT_KEY!);
+  req.session = { userJwt };
 
   const response = { userJwt, createUser };
   res.status(200).send(response);
@@ -42,12 +44,28 @@ export const signIn: RequestHandler = async (req, res, next) => {
 
   const payload: JwtPayload = { id: existUser.id, email: existUser.email };
   const userJwt = sign(payload, process.env.JWT_KEY!);
+  req.session = { userJwt };
 
   const response = { userJwt, existUser };
   res.status(200).send(response);
 };
 
+export const addFavorite = async (req: Request, res: Response) => {
+  const favoriteCredentials = {
+    user: req.currentUser.id,
+    track: { ...req.body },
+  };
+
+  const newFavorite = await Favorite.addFavorite(favoriteCredentials);
+
+  if (!newFavorite) {
+    throw new BadRequestError('Something worng with user repository');
+  }
+
+  res.send(newFavorite);
+};
+
 export const signOut: RequestHandler = (req, res, next) => {
-  // req.currentUser = undefined;
+  req.session = { userJwt: null };
   res.send({});
 };

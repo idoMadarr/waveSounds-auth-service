@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,10 +47,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signOut = exports.signIn = exports.signUp = void 0;
+exports.signOut = exports.addFavorite = exports.signIn = exports.signUp = void 0;
 var jsonwebtoken_1 = require("jsonwebtoken");
 var bad_request_error_1 = require("../errors/bad-request-error");
 var User_1 = require("../models/User");
+var Favorite_1 = require("../models/Favorite");
 var signUp = function (req, res, _next) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, email, username, password, existUser, hashingPassword, createUser, payload, userJwt, response;
     return __generator(this, function (_b) {
@@ -59,12 +71,13 @@ var signUp = function (req, res, _next) { return __awaiter(void 0, void 0, void 
                 return [4 /*yield*/, createUser.save()];
             case 3:
                 _b.sent();
+                Favorite_1.Favorite.buildRepo(createUser.id);
                 payload = {
                     id: createUser.id,
                     email: createUser.email,
-                    username: createUser.username,
                 };
                 userJwt = jsonwebtoken_1.sign(payload, process.env.JWT_KEY);
+                req.session = { userJwt: userJwt };
                 response = { userJwt: userJwt, createUser: createUser };
                 res.status(200).send(response);
                 return [2 /*return*/];
@@ -92,6 +105,7 @@ var signIn = function (req, res, next) { return __awaiter(void 0, void 0, void 0
                 }
                 payload = { id: existUser.id, email: existUser.email };
                 userJwt = jsonwebtoken_1.sign(payload, process.env.JWT_KEY);
+                req.session = { userJwt: userJwt };
                 response = { userJwt: userJwt, existUser: existUser };
                 res.status(200).send(response);
                 return [2 /*return*/];
@@ -99,8 +113,29 @@ var signIn = function (req, res, next) { return __awaiter(void 0, void 0, void 0
     });
 }); };
 exports.signIn = signIn;
+var addFavorite = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var favoriteCredentials, newFavorite;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                favoriteCredentials = {
+                    user: req.currentUser.id,
+                    track: __assign({}, req.body),
+                };
+                return [4 /*yield*/, Favorite_1.Favorite.addFavorite(favoriteCredentials)];
+            case 1:
+                newFavorite = _a.sent();
+                if (!newFavorite) {
+                    throw new bad_request_error_1.BadRequestError('Something worng with user repository');
+                }
+                res.send(newFavorite);
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.addFavorite = addFavorite;
 var signOut = function (req, res, next) {
-    // req.currentUser = undefined;
+    req.session = { userJwt: null };
     res.send({});
 };
 exports.signOut = signOut;

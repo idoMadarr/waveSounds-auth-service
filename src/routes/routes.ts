@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { signUp, signIn, signOut } from '../controller/controller';
+import { signUp, signIn, addFavorite, signOut } from '../controller/controller';
 import { validationMiddleware } from '../middlewares/validation-middleware';
+import { authMiddleware } from '../middlewares/auth-middleware';
 
 const route = Router();
 
-// https://ticketing.dev/api/signup
+//  http://localhost:4000/ws-api/signup
 route.post(
   '/signup',
   [
@@ -20,7 +21,7 @@ route.post(
   signUp
 );
 
-// https://ticketing.dev/api/signin
+//  http://localhost:4000/ws-api/signin
 route.post(
   '/signin',
   [
@@ -31,7 +32,22 @@ route.post(
   signIn
 );
 
-// https://ticketing.dev/api/users/signout
+//  http://localhost:4000/ws-api/add-favorite
+route.post(
+  '/add-favorite',
+  [
+    authMiddleware,
+    body('title').notEmpty().withMessage('Title must be supplied'),
+    body('artist').notEmpty().withMessage('Artist must be supplied'),
+    body('rank').notEmpty().withMessage('Rank must be supplied'),
+    body('image').notEmpty().withMessage('Image must be supplied'),
+    body('preview').notEmpty().withMessage('Preview must be supplied'),
+    validationMiddleware,
+  ],
+  addFavorite
+);
+
+//  http://localhost:4000/ws-api/signout
 route.post('/signout', signOut);
 
 export { route as authRoutes };
