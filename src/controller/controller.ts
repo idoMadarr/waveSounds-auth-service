@@ -59,7 +59,7 @@ export const addFavorite = async (req: Request, res: Response) => {
   const newFavorite = await Favorite.addFavorite(favoriteCredentials);
 
   if (!newFavorite) {
-    throw new BadRequestError('Something worng with user repository');
+    throw new BadRequestError('Favorite already exists');
   }
 
   res.send(newFavorite);

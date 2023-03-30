@@ -17,9 +17,10 @@ interface FavoriteModel extends Model<FavoriteDoc> {
 }
 
 interface FavoriteRepo {
+  id: string;
   title: string;
   artist: string;
-  rank?: number;
+  rank: number;
   image: string;
   preview: string;
 }
@@ -60,6 +61,14 @@ favoriteSchema.statics.addFavorite = async (
   })) as FavoriteDoc;
 
   if (!userFavorites?.repo) {
+    return false;
+  }
+
+  const favoriteExist = userFavorites.repo.find(
+    item => item.id === credentials.track.id
+  );
+
+  if (favoriteExist) {
     return false;
   }
 
