@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { signUp, signIn, addFavorite, signOut } from '../controller/controller';
+import {
+  signUp,
+  signIn,
+  getFavorites,
+  addFavorite,
+  signOut,
+} from '../controller/controller';
 import { validationMiddleware } from '../middlewares/validation-middleware';
 import { authMiddleware } from '../middlewares/auth-middleware';
 
@@ -31,6 +37,9 @@ route.post(
   ],
   signIn
 );
+
+// http://localhost:4000/ws-api/favorites
+route.get('/favorites', authMiddleware, getFavorites);
 
 //  http://localhost:4000/ws-api/add-favorite
 route.post(

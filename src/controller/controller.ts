@@ -65,6 +65,12 @@ export const addFavorite = async (req: Request, res: Response) => {
   res.send(newFavorite);
 };
 
+export const getFavorites = async (req: Request, res: Response) => {
+  const userFavories = await Favorite.findOne({ user: req.currentUser.id });
+
+  res.send(userFavories?.repo);
+};
+
 export const signOut: RequestHandler = (req, res, next) => {
   req.session = { userJwt: null };
   res.send({});
