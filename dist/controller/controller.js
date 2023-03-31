@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signOut = exports.addFavorite = exports.signIn = exports.signUp = void 0;
+exports.signOut = exports.getFavorites = exports.addFavorite = exports.signIn = exports.signUp = void 0;
 var jsonwebtoken_1 = require("jsonwebtoken");
 var bad_request_error_1 = require("../errors/bad-request-error");
 var User_1 = require("../models/User");
@@ -126,7 +126,7 @@ var addFavorite = function (req, res) { return __awaiter(void 0, void 0, void 0,
             case 1:
                 newFavorite = _a.sent();
                 if (!newFavorite) {
-                    throw new bad_request_error_1.BadRequestError('Something worng with user repository');
+                    throw new bad_request_error_1.BadRequestError('Favorite already exists');
                 }
                 res.send(newFavorite);
                 return [2 /*return*/];
@@ -134,6 +134,19 @@ var addFavorite = function (req, res) { return __awaiter(void 0, void 0, void 0,
     });
 }); };
 exports.addFavorite = addFavorite;
+var getFavorites = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var userFavories;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, Favorite_1.Favorite.findOne({ user: req.currentUser.id })];
+            case 1:
+                userFavories = _a.sent();
+                res.send(userFavories === null || userFavories === void 0 ? void 0 : userFavories.repo);
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.getFavorites = getFavorites;
 var signOut = function (req, res, next) {
     req.session = { userJwt: null };
     res.send({});

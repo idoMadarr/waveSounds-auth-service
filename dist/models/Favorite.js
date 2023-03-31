@@ -71,7 +71,7 @@ favoriteSchema.statics.buildRepo = function (user) { return __awaiter(void 0, vo
     });
 }); };
 favoriteSchema.statics.addFavorite = function (credentials) { return __awaiter(void 0, void 0, void 0, function () {
-    var userFavorites;
+    var userFavorites, favoriteExist;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, exports.Favorite.findOne({
@@ -80,6 +80,10 @@ favoriteSchema.statics.addFavorite = function (credentials) { return __awaiter(v
             case 1:
                 userFavorites = (_a.sent());
                 if (!(userFavorites === null || userFavorites === void 0 ? void 0 : userFavorites.repo)) {
+                    return [2 /*return*/, false];
+                }
+                favoriteExist = userFavorites.repo.find(function (item) { return item.id === credentials.track.id; });
+                if (favoriteExist) {
                     return [2 /*return*/, false];
                 }
                 userFavorites.repo.push(credentials.track);
