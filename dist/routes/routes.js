@@ -31,10 +31,15 @@ route.post('/add-favorite', [
     auth_middleware_1.authMiddleware,
     express_validator_1.body('title').notEmpty().withMessage('Title must be supplied'),
     express_validator_1.body('artist').notEmpty().withMessage('Artist must be supplied'),
-    express_validator_1.body('rank').notEmpty().withMessage('Rank must be supplied'),
     express_validator_1.body('image').notEmpty().withMessage('Image must be supplied'),
     express_validator_1.body('preview').notEmpty().withMessage('Preview must be supplied'),
     validation_middleware_1.validationMiddleware,
 ], controller_1.addFavorite);
+//  http://localhost:4000/ws-api/remove-favorite/:id
+route.delete('/remove-favorite/:id', [
+    auth_middleware_1.authMiddleware,
+    express_validator_1.param('id').exists().withMessage('Track ID is required'),
+    validation_middleware_1.validationMiddleware,
+], controller_1.removeFavorites);
 //  http://localhost:4000/ws-api/signout
 route.post('/signout', controller_1.signOut);

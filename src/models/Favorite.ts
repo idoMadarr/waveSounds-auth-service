@@ -14,13 +14,13 @@ interface FavoriteDoc extends Document {
 interface FavoriteModel extends Model<FavoriteDoc> {
   buildRepo(user: ObjectId): void;
   addFavorite(favoriteCredentials: FavoriteCredentials): FavoriteRepo;
+  deleteFavorite(user: any, favoriteId: string): boolean | string;
 }
 
 interface FavoriteRepo {
   id: string;
   title: string;
   artist: string;
-  rank: number;
   image: string;
   preview: string;
 }
@@ -75,6 +75,27 @@ favoriteSchema.statics.addFavorite = async (
   userFavorites.repo.push(credentials.track);
   await userFavorites?.save();
   return credentials.track;
+};
+
+favoriteSchema.statics.deleteFavorite = async (
+  user: any,
+  favoriteId: string
+) => {
+  const userFavorites = (await Favorite.findOne({
+    user,
+  })) as FavoriteDoc;
+
+  if (!userFavorites?.repo) {
+    return false;
+  }
+
+  const updateFavorites = userFavorites.repo.filter(
+    favorite => favorite.id != favoriteId
+  );
+  userFavorites.repo = updateFavorites;
+  await userFavorites.save();
+
+  return { favoriteId };
 };
 
 export const Favorite = model<FavoriteDoc, FavoriteModel>(

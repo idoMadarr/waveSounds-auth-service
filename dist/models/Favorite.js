@@ -94,4 +94,25 @@ favoriteSchema.statics.addFavorite = function (credentials) { return __awaiter(v
         }
     });
 }); };
+favoriteSchema.statics.deleteFavorite = function (user, favoriteId) { return __awaiter(void 0, void 0, void 0, function () {
+    var userFavorites, updateFavorites;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, exports.Favorite.findOne({
+                    user: user,
+                })];
+            case 1:
+                userFavorites = (_a.sent());
+                if (!(userFavorites === null || userFavorites === void 0 ? void 0 : userFavorites.repo)) {
+                    return [2 /*return*/, false];
+                }
+                updateFavorites = userFavorites.repo.filter(function (favorite) { return favorite.id != favoriteId; });
+                userFavorites.repo = updateFavorites;
+                return [4 /*yield*/, userFavorites.save()];
+            case 2:
+                _a.sent();
+                return [2 /*return*/, { favoriteId: favoriteId }];
+        }
+    });
+}); };
 exports.Favorite = mongoose_1.model('Favorite', favoriteSchema);

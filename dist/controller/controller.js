@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signOut = exports.getFavorites = exports.addFavorite = exports.signIn = exports.signUp = void 0;
+exports.signOut = exports.removeFavorites = exports.getFavorites = exports.addFavorite = exports.signIn = exports.signUp = void 0;
 var jsonwebtoken_1 = require("jsonwebtoken");
 var bad_request_error_1 = require("../errors/bad-request-error");
 var User_1 = require("../models/User");
@@ -147,6 +147,24 @@ var getFavorites = function (req, res) { return __awaiter(void 0, void 0, void 0
     });
 }); };
 exports.getFavorites = getFavorites;
+var removeFavorites = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var favoriteId, favorite;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                favoriteId = req.params.id;
+                return [4 /*yield*/, Favorite_1.Favorite.deleteFavorite(req.currentUser.id, favoriteId)];
+            case 1:
+                favorite = _a.sent();
+                if (!favorite) {
+                    throw new bad_request_error_1.BadRequestError('Invalid credentials');
+                }
+                res.send(favorite);
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.removeFavorites = removeFavorites;
 var signOut = function (req, res, next) {
     req.session = { userJwt: null };
     res.send({});

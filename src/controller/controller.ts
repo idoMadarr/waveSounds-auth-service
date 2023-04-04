@@ -71,6 +71,21 @@ export const getFavorites = async (req: Request, res: Response) => {
   res.send(userFavories?.repo);
 };
 
+export const removeFavorites = async (req: Request, res: Response) => {
+  const favoriteId = req.params.id;
+
+  const favorite = await Favorite.deleteFavorite(
+    req.currentUser.id,
+    favoriteId
+  );
+
+  if (!favorite) {
+    throw new BadRequestError('Invalid credentials');
+  }
+
+  res.send(favorite);
+};
+
 export const signOut: RequestHandler = (req, res, next) => {
   req.session = { userJwt: null };
   res.send({});

@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import {
   signUp,
   signIn,
   getFavorites,
   addFavorite,
+  removeFavorites,
   signOut,
 } from '../controller/controller';
 import { validationMiddleware } from '../middlewares/validation-middleware';
@@ -48,12 +49,22 @@ route.post(
     authMiddleware,
     body('title').notEmpty().withMessage('Title must be supplied'),
     body('artist').notEmpty().withMessage('Artist must be supplied'),
-    body('rank').notEmpty().withMessage('Rank must be supplied'),
     body('image').notEmpty().withMessage('Image must be supplied'),
     body('preview').notEmpty().withMessage('Preview must be supplied'),
     validationMiddleware,
   ],
   addFavorite
+);
+
+//  http://localhost:4000/ws-api/remove-favorite/:id
+route.delete(
+  '/remove-favorite/:id',
+  [
+    authMiddleware,
+    param('id').exists().withMessage('Track ID is required'),
+    validationMiddleware,
+  ],
+  removeFavorites
 );
 
 //  http://localhost:4000/ws-api/signout
