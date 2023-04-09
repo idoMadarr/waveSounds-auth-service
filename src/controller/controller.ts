@@ -50,6 +50,35 @@ export const signIn: RequestHandler = async (req, res, next) => {
   res.status(200).send(response);
 };
 
+export const googleOAuth: RequestHandler = async (req, res, next) => {
+  const { email, username } = req.body;
+
+  const existUser = await User.findOne({ email });
+  if (existUser) {
+    const payload: JwtPayload = { id: existUser._id, email: existUser.email };
+    const userJwt = sign(payload, process.env.JWT_KEY!);
+    req.session = { userJwt };
+
+    const response = { userJwt, user: existUser };
+    return res.status(200).send(response);
+  }
+
+  const password = await User.toHash('oauth_pass');
+  const createUser = User.build({ email, username, password });
+  await createUser.save();
+  Favorite.buildRepo(createUser.id);
+
+  const payload: JwtPayload = {
+    id: createUser.id,
+    email: createUser.email,
+  };
+  const userJwt = sign(payload, process.env.JWT_KEY!);
+  req.session = { userJwt };
+
+  const response = { userJwt, user: createUser };
+  res.status(200).send(response);
+};
+
 export const addFavorite = async (req: Request, res: Response) => {
   const favoriteCredentials = {
     user: req.currentUser.id,

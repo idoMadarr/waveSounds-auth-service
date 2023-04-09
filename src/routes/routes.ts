@@ -3,6 +3,7 @@ import { body, param } from 'express-validator';
 import {
   signUp,
   signIn,
+  googleOAuth,
   getFavorites,
   addFavorite,
   removeFavorites,
@@ -37,6 +38,17 @@ route.post(
     validationMiddleware,
   ],
   signIn
+);
+
+// http://localhost:4000/ws-api/google-oauth
+route.post(
+  '/google-oauth',
+  [
+    body('email').isEmail().withMessage('Valid Email must be supply'),
+    body('username').notEmpty().withMessage('Username must be supply'),
+    validationMiddleware,
+  ],
+  googleOAuth
 );
 
 // http://localhost:4000/ws-api/favorites
