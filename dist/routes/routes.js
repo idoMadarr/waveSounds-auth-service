@@ -24,6 +24,12 @@ route.post('/signin', [
     express_validator_1.body('password').trim().notEmpty().withMessage('Password must be supply'),
     validation_middleware_1.validationMiddleware,
 ], controller_1.signIn);
+// http://localhost:4000/ws-api/google-oauth
+route.post('/google-oauth', [
+    express_validator_1.body('email').isEmail().withMessage('Valid Email must be supply'),
+    express_validator_1.body('username').notEmpty().withMessage('Username must be supply'),
+    validation_middleware_1.validationMiddleware,
+], controller_1.googleOAuth);
 // http://localhost:4000/ws-api/favorites
 route.get('/favorites', auth_middleware_1.authMiddleware, controller_1.getFavorites);
 //  http://localhost:4000/ws-api/add-favorite

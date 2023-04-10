@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signOut = exports.removeFavorites = exports.getFavorites = exports.addFavorite = exports.signIn = exports.signUp = void 0;
+exports.signOut = exports.removeFavorites = exports.getFavorites = exports.addFavorite = exports.googleOAuth = exports.signIn = exports.signUp = void 0;
 var jsonwebtoken_1 = require("jsonwebtoken");
 var bad_request_error_1 = require("../errors/bad-request-error");
 var User_1 = require("../models/User");
@@ -113,6 +113,43 @@ var signIn = function (req, res, next) { return __awaiter(void 0, void 0, void 0
     });
 }); };
 exports.signIn = signIn;
+var googleOAuth = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, email, username, existUser, payload_1, userJwt_1, response_1, password, createUser, payload, userJwt, response;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _a = req.body, email = _a.email, username = _a.username;
+                return [4 /*yield*/, User_1.User.findOne({ email: email })];
+            case 1:
+                existUser = _b.sent();
+                if (existUser) {
+                    payload_1 = { id: existUser._id, email: existUser.email };
+                    userJwt_1 = jsonwebtoken_1.sign(payload_1, process.env.JWT_KEY);
+                    req.session = { userJwt: userJwt_1 };
+                    response_1 = { userJwt: userJwt_1, user: existUser };
+                    return [2 /*return*/, res.status(200).send(response_1)];
+                }
+                return [4 /*yield*/, User_1.User.toHash('oauth_pass')];
+            case 2:
+                password = _b.sent();
+                createUser = User_1.User.build({ email: email, username: username, password: password });
+                return [4 /*yield*/, createUser.save()];
+            case 3:
+                _b.sent();
+                Favorite_1.Favorite.buildRepo(createUser.id);
+                payload = {
+                    id: createUser.id,
+                    email: createUser.email,
+                };
+                userJwt = jsonwebtoken_1.sign(payload, process.env.JWT_KEY);
+                req.session = { userJwt: userJwt };
+                response = { userJwt: userJwt, user: createUser };
+                res.status(200).send(response);
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.googleOAuth = googleOAuth;
 var addFavorite = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var favoriteCredentials, newFavorite;
     return __generator(this, function (_a) {
