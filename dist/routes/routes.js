@@ -49,3 +49,5 @@ route.delete('/remove-favorite/:id', [
 ], controller_1.removeFavorites);
 //  http://localhost:4000/ws-api/signout
 route.post('/signout', controller_1.signOut);
+//  http://localhost:4000/ws-api/connected-users
+route.get('/connected-users', [auth_middleware_1.authMiddleware], controller_1.getUsers);

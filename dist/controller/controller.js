@@ -47,11 +47,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signOut = exports.removeFavorites = exports.getFavorites = exports.addFavorite = exports.googleOAuth = exports.signIn = exports.signUp = void 0;
+exports.getUsers = exports.signOut = exports.removeFavorites = exports.getFavorites = exports.addFavorite = exports.googleOAuth = exports.signIn = exports.signUp = void 0;
 var jsonwebtoken_1 = require("jsonwebtoken");
 var bad_request_error_1 = require("../errors/bad-request-error");
 var User_1 = require("../models/User");
 var Favorite_1 = require("../models/Favorite");
+var socketIO_1 = require("../services/socketIO");
 var signUp = function (req, res, _next) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, email, username, password, existUser, hashingPassword, createUser, payload, userJwt, response;
     return __generator(this, function (_b) {
@@ -78,7 +79,7 @@ var signUp = function (req, res, _next) { return __awaiter(void 0, void 0, void 
                 };
                 userJwt = jsonwebtoken_1.sign(payload, process.env.JWT_KEY);
                 req.session = { userJwt: userJwt };
-                response = { userJwt: userJwt, createUser: createUser };
+                response = { userJwt: userJwt, user: createUser };
                 res.status(200).send(response);
                 return [2 /*return*/];
         }
@@ -106,7 +107,7 @@ var signIn = function (req, res, next) { return __awaiter(void 0, void 0, void 0
                 payload = { id: existUser.id, email: existUser.email };
                 userJwt = jsonwebtoken_1.sign(payload, process.env.JWT_KEY);
                 req.session = { userJwt: userJwt };
-                response = { userJwt: userJwt, existUser: existUser };
+                response = { userJwt: userJwt, user: existUser };
                 res.status(200).send(response);
                 return [2 /*return*/];
         }
@@ -207,3 +208,7 @@ var signOut = function (req, res, next) {
     res.send({});
 };
 exports.signOut = signOut;
+var getUsers = function (req, res, next) {
+    res.send(socketIO_1.connectedClients);
+};
+exports.getUsers = getUsers;

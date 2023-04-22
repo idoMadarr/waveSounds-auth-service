@@ -63,6 +63,8 @@ var express_1 = __importDefault(require("express"));
 var mongoose_1 = __importDefault(require("mongoose"));
 var cookie_session_1 = __importDefault(require("cookie-session"));
 require("express-async-errors");
+var socketIO_1 = __importDefault(require("./services/socketIO"));
+// import { client } from './services/redis';
 var not_found_error_1 = require("./errors/not-found-error");
 var error_middleware_1 = require("./middlewares/error-middleware");
 var routes_1 = require("./routes/routes");
@@ -79,9 +81,12 @@ app.all('*', function () { return __awaiter(void 0, void 0, void 0, function () 
     });
 }); });
 app.use(error_middleware_1.errorMiddleware);
-mongoose_1.default.connect(process.env.MONGO_URI, function () {
-    console.log('Connected to MongoDB');
-    app.listen(process.env.PORT, function () {
-        return console.log("Server started on port " + process.env.PORT);
+var initServer = function () {
+    mongoose_1.default.connect(process.env.MONGO_URI, function () {
+        var server = app.listen(process.env.PORT, function () {
+            console.log("Server started on port " + process.env.PORT);
+            socketIO_1.default.socketInit(server);
+        });
     });
-});
+};
+initServer();
