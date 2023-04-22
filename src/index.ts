@@ -3,6 +3,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cookieSession from 'cookie-session';
 import 'express-async-errors';
+import SocketIO from './services/socketIO';
+// import { client } from './services/redis';
 import { NotFoundError } from './errors/not-found-error';
 import { errorMiddleware } from './middlewares/error-middleware';
 import { authRoutes } from './routes/routes';
@@ -23,9 +25,13 @@ app.all('*', async () => {
 });
 app.use(errorMiddleware);
 
-mongoose.connect(process.env.MONGO_URI!, () => {
-  console.log('Connected to MongoDB');
-  app.listen(process.env.PORT, () =>
-    console.log(`Server started on port ${process.env.PORT}`)
-  );
-});
+const initServer = () => {
+  mongoose.connect(process.env.MONGO_URI!, () => {
+    const server = app.listen(process.env.PORT, () => {
+      console.log(`Server started on port ${process.env.PORT}`);
+      SocketIO.socketInit(server);
+    });
+  });
+};
+
+initServer();

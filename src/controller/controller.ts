@@ -3,6 +3,7 @@ import { sign, JwtPayload } from 'jsonwebtoken';
 import { BadRequestError } from '../errors/bad-request-error';
 import { User } from '../models/User';
 import { Favorite } from '../models/Favorite';
+import { connectedClients } from '../services/socketIO';
 
 export const signUp: RequestHandler = async (req, res, _next) => {
   const { email, username, password } = req.body;
@@ -25,7 +26,7 @@ export const signUp: RequestHandler = async (req, res, _next) => {
   const userJwt = sign(payload, process.env.JWT_KEY!);
   req.session = { userJwt };
 
-  const response = { userJwt, createUser };
+  const response = { userJwt, user: createUser };
   res.status(200).send(response);
 };
 
@@ -46,7 +47,7 @@ export const signIn: RequestHandler = async (req, res, next) => {
   const userJwt = sign(payload, process.env.JWT_KEY!);
   req.session = { userJwt };
 
-  const response = { userJwt, existUser };
+  const response = { userJwt, user: existUser };
   res.status(200).send(response);
 };
 
@@ -118,4 +119,8 @@ export const removeFavorites = async (req: Request, res: Response) => {
 export const signOut: RequestHandler = (req, res, next) => {
   req.session = { userJwt: null };
   res.send({});
+};
+
+export const getUsers: RequestHandler = (req, res, next) => {
+  res.send(connectedClients);
 };

@@ -8,6 +8,7 @@ import {
   addFavorite,
   removeFavorites,
   signOut,
+  getUsers,
 } from '../controller/controller';
 import { validationMiddleware } from '../middlewares/validation-middleware';
 import { authMiddleware } from '../middlewares/auth-middleware';
@@ -81,5 +82,8 @@ route.delete(
 
 //  http://localhost:4000/ws-api/signout
 route.post('/signout', signOut);
+
+//  http://localhost:4000/ws-api/connected-users
+route.get('/connected-users', [authMiddleware], getUsers);
 
 export { route as authRoutes };
