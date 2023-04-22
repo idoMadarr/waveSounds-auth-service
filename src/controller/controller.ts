@@ -122,5 +122,6 @@ export const signOut: RequestHandler = (req, res, next) => {
 };
 
 export const getUsers: RequestHandler = (req, res, next) => {
+  console.log(connectedClients, 'connectedClients');
   res.send(connectedClients);
 };
