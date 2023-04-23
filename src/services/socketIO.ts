@@ -11,7 +11,7 @@ interface ConnectedClientType {
 }
 
 let io: any;
-export const connectedClients: ClientsDatabaseType = {};
+export let connectedClients: ClientsDatabaseType = {};
 
 export default {
   socketInit: (server: any) => {
@@ -19,6 +19,8 @@ export default {
     console.log('Socket Connected');
 
     io.on('connection', (socket: any) => {
+      console.log(socket.id, 'socket.id');
+
       socket.on('auth', (data: any) => {
         for (let client in connectedClients) {
           const activeClient = connectedClients[client].userId === data.user.id;
