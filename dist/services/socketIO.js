@@ -7,6 +7,7 @@ exports.connectedClients = {};
 exports.default = {
     socketInit: function (server) {
         io = new socket_io_1.Server(server, { pingInterval: 2500, pingTimeout: 5000 });
+        console.log('Socket Connected');
         io.on('connection', function (socket) {
             socket.on('auth', function (data) {
                 var _a;
