@@ -16,6 +16,7 @@ export const connectedClients: ClientsDatabaseType = {};
 export default {
   socketInit: (server: any) => {
     io = new Server(server, { pingInterval: 2500, pingTimeout: 5000 });
+    console.log('Socket Connected');
 
     io.on('connection', (socket: any) => {
       socket.on('auth', (data: any) => {
