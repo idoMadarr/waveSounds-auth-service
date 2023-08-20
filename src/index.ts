@@ -1,4 +1,3 @@
-import * as dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import cookieSession from 'cookie-session';
@@ -9,6 +8,7 @@ import { NotFoundError } from './errors/not-found-error';
 import { errorMiddleware } from './middlewares/error-middleware';
 import { authRoutes } from './routes/routes';
 import * as _namespace from './node-types/index';
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();

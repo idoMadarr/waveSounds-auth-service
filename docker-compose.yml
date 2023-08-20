@@ -1,0 +1,17 @@
+version: '3.9'
+services:
+  wavesounds-service:
+    build: 
+      context: .
+    container_name: wavesounds-backend-container
+    ports:
+      - 4000:4000
+    volumes:
+      # - D:/MyDeveloping/waveSounds/server/src:/app
+      # - /app/src:/app
+      # - /app/node_modules
+    command: >
+      sh -c "node index.js"
+
+# docker run --rm --name wavesounds-backend-container -p 4000:4000 -v "D:/MyDeveloping/waveSounds/server:/app" wavesounds-backend-image
+# docker run --rm --name wavesounds-backend-container -p 4000:4000 wavesounds-backend-image
