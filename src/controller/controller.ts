@@ -4,6 +4,7 @@ import { BadRequestError } from '../errors/bad-request-error';
 import { User } from '../models/User';
 import { Favorite } from '../models/Favorite';
 import { connectedClients } from '../services/socketIO';
+import { firebaseRoot } from '../services/firebase';
 
 export const signUp: RequestHandler = async (req, res, _next) => {
   const { email, username, password } = req.body;
@@ -124,4 +125,28 @@ export const signOut: RequestHandler = (req, res, next) => {
 export const getUsers: RequestHandler = (req, res, next) => {
   console.log(connectedClients, 'connectedClients');
   res.send(connectedClients);
+};
+
+export const sendPushNotification: RequestHandler = (req, res, next) => {
+  const registrationToken = req.body.registrationToken;
+
+  const message = {
+    notification: {
+      title: 'Notification Title',
+      body: 'Notification Body',
+    },
+    token: registrationToken,
+  };
+
+  firebaseRoot
+    .messaging()
+    .send(message)
+    .then((response: any) => {
+      res.send('Successfully sent message:');
+      console.log('Successfully sent message:', response);
+    })
+    .catch((error: any) => {
+      console.log('Error sending message:', error);
+      res.send('Failed to sent message:');
+    });
 };
