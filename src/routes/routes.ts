@@ -9,7 +9,8 @@ import {
   removeFavorites,
   signOut,
   getUsers,
-  sendPushNotification,
+  sendTopicPushNotification,
+  sendDevicePushNotification,
 } from '../controller/controller';
 import { validationMiddleware } from '../middlewares/validation-middleware';
 import { authMiddleware } from '../middlewares/auth-middleware';
@@ -88,6 +89,9 @@ route.post('/signout', signOut);
 route.get('/connected-users', [authMiddleware], getUsers);
 
 //  http://localhost:4000/ws-api/push-notifications
-route.post('/push-notifications', sendPushNotification);
+route.get('/push-notifications-topic', sendTopicPushNotification);
+
+//  http://localhost:4000/ws-api/push-notifications-device
+route.post('/push-notifications-device', sendDevicePushNotification);
 
 export { route as authRoutes };

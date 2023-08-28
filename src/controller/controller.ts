@@ -4,10 +4,14 @@ import { BadRequestError } from '../errors/bad-request-error';
 import { User } from '../models/User';
 import { Favorite } from '../models/Favorite';
 import { connectedClients } from '../services/socketIO';
-import { firebaseRoot } from '../services/firebase';
+import {
+  subscribeTopic,
+  unsubscribeTopic,
+  sendToSubscriptions,
+} from '../services/firebase';
 
 export const signUp: RequestHandler = async (req, res, _next) => {
-  const { email, username, password } = req.body;
+  const { email, username, password, fcmToken } = req.body;
 
   const existUser = await User.find({ email });
 
@@ -27,12 +31,16 @@ export const signUp: RequestHandler = async (req, res, _next) => {
   const userJwt = sign(payload, process.env.JWT_KEY!);
   req.session = { userJwt };
 
+  if (fcmToken) {
+    subscribeTopic(fcmToken);
+  }
+
   const response = { userJwt, user: createUser };
   res.status(200).send(response);
 };
 
 export const signIn: RequestHandler = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, fcmToken } = req.body;
 
   const existUser = await User.findOne({ email });
   if (!existUser) {
@@ -47,6 +55,10 @@ export const signIn: RequestHandler = async (req, res, next) => {
   const payload: JwtPayload = { id: existUser.id, email: existUser.email };
   const userJwt = sign(payload, process.env.JWT_KEY!);
   req.session = { userJwt };
+
+  if (fcmToken) {
+    subscribeTopic(fcmToken);
+  }
 
   const response = { userJwt, user: existUser };
   res.status(200).send(response);
@@ -117,9 +129,15 @@ export const removeFavorites = async (req: Request, res: Response) => {
   res.send(favorite);
 };
 
-export const signOut: RequestHandler = (req, res, next) => {
+export const signOut: RequestHandler = async (req, res, next) => {
+  const { fcmToken } = req.body;
+
+  if (fcmToken) {
+    unsubscribeTopic(fcmToken);
+  }
+
   req.session = { userJwt: null };
-  res.send({});
+  res.send({ message: 'User signout successfully' });
 };
 
 export const getUsers: RequestHandler = (req, res, next) => {
@@ -127,26 +145,42 @@ export const getUsers: RequestHandler = (req, res, next) => {
   res.send(connectedClients);
 };
 
-export const sendPushNotification: RequestHandler = (req, res, next) => {
-  const registrationToken = req.body.registrationToken;
+export const sendTopicPushNotification: RequestHandler = async (
+  req,
+  res,
+  _next
+) => {
+  const message = {
+    notification: {
+      title: 'Wavesounds - new update release!',
+      body: 'Ido test!!!',
+    },
+    topic: 'all_users',
+  };
+
+  await sendToSubscriptions(message);
+
+  res.send({});
+};
+
+export const sendDevicePushNotification: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const { fcmToken } = req.body;
 
   const message = {
     notification: {
-      title: 'Notification Title',
-      body: 'Notification Body',
+      title: 'Hello!',
+      body: `Meet WaveSounds: the finest music player in town! 
+             Elevate your musical journey with us - where every note resonates and every beat comes alive. 
+             Best regards, @WaveSounds.`,
     },
-    token: registrationToken,
+    token: fcmToken,
   };
 
-  firebaseRoot
-    .messaging()
-    .send(message)
-    .then((response: any) => {
-      res.send('Successfully sent message:');
-      console.log('Successfully sent message:', response);
-    })
-    .catch((error: any) => {
-      console.log('Error sending message:', error);
-      res.send('Failed to sent message:');
-    });
+  await sendToSubscriptions(message);
+
+  res.send({});
 };
