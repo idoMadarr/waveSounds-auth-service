@@ -51,3 +51,7 @@ route.delete('/remove-favorite/:id', [
 route.post('/signout', controller_1.signOut);
 //  http://localhost:4000/ws-api/connected-users
 route.get('/connected-users', [auth_middleware_1.authMiddleware], controller_1.getUsers);
+//  http://localhost:4000/ws-api/push-notifications
+route.get('/push-notifications-topic', controller_1.sendTopicPushNotification);
+//  http://localhost:4000/ws-api/push-notifications-device
+route.post('/push-notifications-device', controller_1.sendDevicePushNotification);

@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -54,39 +35,62 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require("express"));
-var mongoose_1 = __importDefault(require("mongoose"));
-var cookie_session_1 = __importDefault(require("cookie-session"));
-require("express-async-errors");
-var socketIO_1 = __importDefault(require("./services/socketIO"));
-// import { client } from './services/redis';
-var not_found_error_1 = require("./errors/not-found-error");
-var error_middleware_1 = require("./middlewares/error-middleware");
-var routes_1 = require("./routes/routes");
-var dotenv = __importStar(require("dotenv"));
-dotenv.config();
-var app = express_1.default();
-app.use(express_1.default.json());
-app.use(cookie_session_1.default({
-    signed: false,
-}));
-app.use('/ws-api', routes_1.authRoutes);
-app.all('*', function () { return __awaiter(void 0, void 0, void 0, function () {
+exports.sendToSubscriptions = exports.unsubscribeTopic = exports.subscribeTopic = void 0;
+var admin = require('firebase-admin');
+var serviceAccount = require('./wavesounds-463fe-firebase-adminsdk-ceu99-aef3e49ea8.json');
+var firebaseRoot = admin.initializeApp({
+    projectId: 'wavesounds-463fe',
+    credential: admin.credential.cert(serviceAccount),
+});
+var subscribeTopic = function (fcmToken) { return __awaiter(void 0, void 0, void 0, function () {
+    var registrationTokens;
     return __generator(this, function (_a) {
-        throw new not_found_error_1.NotFoundError();
-    });
-}); });
-app.use(error_middleware_1.errorMiddleware);
-var initServer = function () {
-    mongoose_1.default.connect(process.env.MONGO_URI, function () {
-        var server = app.listen(process.env.PORT, function () {
-            console.log("Server started on port " + process.env.PORT);
-            socketIO_1.default.socketInit(server);
+        registrationTokens = [fcmToken];
+        firebaseRoot
+            .messaging()
+            .subscribeToTopic(registrationTokens, 'all_users')
+            .then(function () {
+            console.log('User subscribed to topic successfully!');
+        })
+            .catch(function (error) {
+            console.error('Error while subscribing to topic:', error);
         });
+        return [2 /*return*/];
     });
-};
-initServer();
+}); };
+exports.subscribeTopic = subscribeTopic;
+var unsubscribeTopic = function (fcmToken) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        firebaseRoot
+            .messaging()
+            .unsubscribeFromTopic([fcmToken], 'all_users')
+            .then(function () {
+            console.log('Unsubscribed from topic successfully');
+        })
+            .catch(function (error) {
+            console.error('Error unsubscribing from topic:', error);
+        });
+        return [2 /*return*/];
+    });
+}); };
+exports.unsubscribeTopic = unsubscribeTopic;
+var sendToSubscriptions = function (message) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, firebaseRoot
+                    .messaging()
+                    .send(message)
+                    .then(function () {
+                    console.log('Successfully sent message');
+                })
+                    .catch(function (error) {
+                    console.log("Failed to sent message: " + JSON.stringify(error));
+                })];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.sendToSubscriptions = sendToSubscriptions;
