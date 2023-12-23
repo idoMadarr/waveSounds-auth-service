@@ -13,7 +13,7 @@ RUN npm run ts-build
 ENV PORT=4000
 ENV MONGO_URI=mongodb+srv://idoadar:239738416@cluster0.v9cyqlg.mongodb.net/auth
 ENV JWT_KEY=my_secret_key
-ENV REDIS_PORT=6379
+ENV REDIS_URI=redis://red-cm3e4cen7f5s73bnr0dg:6379
 
 # WORKDIR ./src
 

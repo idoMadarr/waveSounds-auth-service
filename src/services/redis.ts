@@ -1,6 +1,9 @@
 import { createClient } from 'redis';
 
-const client = createClient();
+const client = createClient({
+  url: process.env.REDIS_URI,
+  //   url: process.env.REDIS_DEV_PORT,
+});
 
 client.connect();
 
