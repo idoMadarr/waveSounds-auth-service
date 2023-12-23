@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 import cookieSession from 'cookie-session';
 import 'express-async-errors';
 import SocketIO from './services/socketIO';
-// import { client } from './services/redis';
 import { NotFoundError } from './errors/not-found-error';
 import { errorMiddleware } from './middlewares/error-middleware';
 import { authRoutes } from './routes/routes';
 import * as _namespace from './node-types/index';
 import * as dotenv from 'dotenv';
+import './services/redis';
 dotenv.config();
 
 const app = express();

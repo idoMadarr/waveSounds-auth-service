@@ -3,12 +3,12 @@ import { sign, JwtPayload } from 'jsonwebtoken';
 import { BadRequestError } from '../errors/bad-request-error';
 import { User } from '../models/User';
 import { Favorite } from '../models/Favorite';
-import { connectedClients } from '../services/socketIO';
 import {
   subscribeTopic,
   unsubscribeTopic,
   sendToSubscriptions,
 } from '../services/firebase';
+import client from '../services/redis';
 
 export const signUp: RequestHandler = async (req, res, _next) => {
   const { email, username, password, fcmToken } = req.body;
@@ -140,9 +140,18 @@ export const signOut: RequestHandler = async (req, res, next) => {
   res.send({ message: 'User signout successfully' });
 };
 
-export const getUsers: RequestHandler = (req, res, next) => {
-  console.log(connectedClients, 'connectedClients');
-  res.send(connectedClients);
+export const getUsers: RequestHandler = async (req, res, next) => {
+  const actives = await client.hGetAll('onlines');
+  const formattedData = Object.entries(actives);
+  const activeUsers = [];
+
+  if (formattedData.length) {
+    for (const key of formattedData) {
+      activeUsers.push(JSON.parse(key[1]));
+    }
+  }
+
+  res.send(activeUsers);
 };
 
 export const sendTopicPushNotification: RequestHandler = async (

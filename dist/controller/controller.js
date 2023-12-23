@@ -46,14 +46,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendDevicePushNotification = exports.sendTopicPushNotification = exports.getUsers = exports.signOut = exports.removeFavorites = exports.getFavorites = exports.addFavorite = exports.googleOAuth = exports.signIn = exports.signUp = void 0;
 var jsonwebtoken_1 = require("jsonwebtoken");
 var bad_request_error_1 = require("../errors/bad-request-error");
 var User_1 = require("../models/User");
 var Favorite_1 = require("../models/Favorite");
-var socketIO_1 = require("../services/socketIO");
 var firebase_1 = require("../services/firebase");
+var redis_1 = __importDefault(require("../services/redis"));
 var signUp = function (req, res, _next) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, email, username, password, fcmToken, existUser, hashingPassword, createUser, payload, userJwt, response;
     return __generator(this, function (_b) {
@@ -223,10 +226,26 @@ var signOut = function (req, res, next) { return __awaiter(void 0, void 0, void 
     });
 }); };
 exports.signOut = signOut;
-var getUsers = function (req, res, next) {
-    console.log(socketIO_1.connectedClients, 'connectedClients');
-    res.send(socketIO_1.connectedClients);
-};
+var getUsers = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var actives, formattedData, activeUsers, _i, formattedData_1, key;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, redis_1.default.hGetAll('onlines')];
+            case 1:
+                actives = _a.sent();
+                formattedData = Object.entries(actives);
+                activeUsers = [];
+                if (formattedData.length) {
+                    for (_i = 0, formattedData_1 = formattedData; _i < formattedData_1.length; _i++) {
+                        key = formattedData_1[_i];
+                        activeUsers.push(JSON.parse(key[1]));
+                    }
+                }
+                res.send(activeUsers);
+                return [2 /*return*/];
+        }
+    });
+}); };
 exports.getUsers = getUsers;
 var sendTopicPushNotification = function (req, res, _next) { return __awaiter(void 0, void 0, void 0, function () {
     var message;
