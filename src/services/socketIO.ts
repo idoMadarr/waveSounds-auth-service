@@ -26,7 +26,7 @@ let io: any;
 
 export default {
   socketInit: (server: any) => {
-    io = new Server(server, { pingInterval: 25000, pingTimeout: 20000 });
+    io = new Server(server, { pingInterval: 5000, pingTimeout: 5000 });
     console.log('Socket Connected');
 
     io.on('connection', (socket: any) => {
@@ -34,15 +34,14 @@ export default {
         // Check if the user already in redis
         const user = await client.hGet('onlines', data.id);
 
-        // if no, add the user to redis cache with "id" (mongodb's id) as a key
-        if (!user) {
-          const userData = { ...data, socketId: socket.id };
-          await client.hSet('onlines', data.id, JSON.stringify(userData));
-          socket.broadcast.emit('update-onlines', {
-            type: 'add',
-            user: userData,
-          });
-        }
+        // Add the user to redis cache with "id" (mongodb's id) as a key
+        // 'update' method should handle a case when the user close the app without disconnect
+        const userData = { ...data, socketId: socket.id };
+        await client.hSet('onlines', data.id, JSON.stringify(userData));
+        socket.broadcast.emit('update-onlines', {
+          type: user ? 'update' : 'add',
+          user: userData,
+        });
       });
 
       socket.on('message', (data: ChatMessageType) => {
@@ -57,8 +56,24 @@ export default {
         });
       });
 
-      socket.on('disconnect', () => {
-        console.log('user disconnected');
+      socket.on('disconnect', async () => {
+        const userOffline = (await client.hScan(
+          'onlines',
+          0,
+          socket.id
+        )) as any;
+        const { cursor, tuples } = userOffline;
+
+        for (const user of tuples) {
+          const userObj = JSON.parse(user.value);
+          if (userObj.socketId === socket.id) {
+            client.hDel('onlines', userObj.id);
+            socket.broadcast.emit('update-onlines', {
+              type: 'remove',
+              user: userObj,
+            });
+          }
+        }
       });
     });
   },
