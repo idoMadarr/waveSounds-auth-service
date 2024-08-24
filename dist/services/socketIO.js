@@ -25,7 +25,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -55,7 +55,7 @@ var redis_1 = __importDefault(require("./redis"));
 var io;
 exports.default = {
     socketInit: function (server) {
-        io = new socket_io_1.Server(server, { pingInterval: 25000, pingTimeout: 20000 });
+        io = new socket_io_1.Server(server, { pingInterval: 5000, pingTimeout: 5000 });
         console.log('Socket Connected');
         io.on('connection', function (socket) {
             socket.on('auth', function (data) { return __awaiter(void 0, void 0, void 0, function () {
@@ -65,17 +65,15 @@ exports.default = {
                         case 0: return [4 /*yield*/, redis_1.default.hGet('onlines', data.id)];
                         case 1:
                             user = _a.sent();
-                            if (!!user) return [3 /*break*/, 3];
                             userData = __assign(__assign({}, data), { socketId: socket.id });
                             return [4 /*yield*/, redis_1.default.hSet('onlines', data.id, JSON.stringify(userData))];
                         case 2:
                             _a.sent();
                             socket.broadcast.emit('update-onlines', {
-                                type: 'add',
+                                type: user ? 'update' : 'add',
                                 user: userData,
                             });
-                            _a.label = 3;
-                        case 3: return [2 /*return*/];
+                            return [2 /*return*/];
                     }
                 });
             }); });
@@ -89,9 +87,29 @@ exports.default = {
                     user: user,
                 });
             });
-            socket.on('disconnect', function () {
-                console.log('user disconnected');
-            });
+            socket.on('disconnect', function () { return __awaiter(void 0, void 0, void 0, function () {
+                var userOffline, cursor, tuples, _i, tuples_1, user, userObj;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, redis_1.default.hScan('onlines', 0, socket.id)];
+                        case 1:
+                            userOffline = (_a.sent());
+                            cursor = userOffline.cursor, tuples = userOffline.tuples;
+                            for (_i = 0, tuples_1 = tuples; _i < tuples_1.length; _i++) {
+                                user = tuples_1[_i];
+                                userObj = JSON.parse(user.value);
+                                if (userObj.socketId === socket.id) {
+                                    redis_1.default.hDel('onlines', userObj.id);
+                                    socket.broadcast.emit('update-onlines', {
+                                        type: 'remove',
+                                        user: userObj,
+                                    });
+                                }
+                            }
+                            return [2 /*return*/];
+                    }
+                });
+            }); });
         });
     },
     getIO: function () {

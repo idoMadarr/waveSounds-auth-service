@@ -25,7 +25,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -81,10 +81,10 @@ var signUp = function (req, res, _next) { return __awaiter(void 0, void 0, void 
                     id: createUser.id,
                     email: createUser.email,
                 };
-                userJwt = jsonwebtoken_1.sign(payload, process.env.JWT_KEY);
+                userJwt = (0, jsonwebtoken_1.sign)(payload, process.env.JWT_KEY);
                 req.session = { userJwt: userJwt };
                 if (fcmToken) {
-                    firebase_1.subscribeTopic(fcmToken);
+                    (0, firebase_1.subscribeTopic)(fcmToken);
                 }
                 response = { userJwt: userJwt, user: createUser };
                 res.status(200).send(response);
@@ -112,10 +112,10 @@ var signIn = function (req, res, next) { return __awaiter(void 0, void 0, void 0
                     throw new bad_request_error_1.BadRequestError('Invalid password, please try again');
                 }
                 payload = { id: existUser.id, email: existUser.email };
-                userJwt = jsonwebtoken_1.sign(payload, process.env.JWT_KEY);
+                userJwt = (0, jsonwebtoken_1.sign)(payload, process.env.JWT_KEY);
                 req.session = { userJwt: userJwt };
                 if (fcmToken) {
-                    firebase_1.subscribeTopic(fcmToken);
+                    (0, firebase_1.subscribeTopic)(fcmToken);
                 }
                 response = { userJwt: userJwt, user: existUser };
                 res.status(200).send(response);
@@ -135,7 +135,7 @@ var googleOAuth = function (req, res, next) { return __awaiter(void 0, void 0, v
                 existUser = _b.sent();
                 if (existUser) {
                     payload_1 = { id: existUser._id, email: existUser.email };
-                    userJwt_1 = jsonwebtoken_1.sign(payload_1, process.env.JWT_KEY);
+                    userJwt_1 = (0, jsonwebtoken_1.sign)(payload_1, process.env.JWT_KEY);
                     req.session = { userJwt: userJwt_1 };
                     response_1 = { userJwt: userJwt_1, user: existUser };
                     return [2 /*return*/, res.status(200).send(response_1)];
@@ -152,7 +152,7 @@ var googleOAuth = function (req, res, next) { return __awaiter(void 0, void 0, v
                     id: createUser.id,
                     email: createUser.email,
                 };
-                userJwt = jsonwebtoken_1.sign(payload, process.env.JWT_KEY);
+                userJwt = (0, jsonwebtoken_1.sign)(payload, process.env.JWT_KEY);
                 req.session = { userJwt: userJwt };
                 response = { userJwt: userJwt, user: createUser };
                 res.status(200).send(response);
@@ -218,7 +218,7 @@ var signOut = function (req, res, next) { return __awaiter(void 0, void 0, void 
     return __generator(this, function (_a) {
         fcmToken = req.body.fcmToken;
         if (fcmToken) {
-            firebase_1.unsubscribeTopic(fcmToken);
+            (0, firebase_1.unsubscribeTopic)(fcmToken);
         }
         req.session = { userJwt: null };
         res.send({ message: 'User signout successfully' });
@@ -259,7 +259,7 @@ var sendTopicPushNotification = function (req, res, _next) { return __awaiter(vo
                     },
                     topic: 'all_users',
                 };
-                return [4 /*yield*/, firebase_1.sendToSubscriptions(message)];
+                return [4 /*yield*/, (0, firebase_1.sendToSubscriptions)(message)];
             case 1:
                 _a.sent();
                 res.send({});
@@ -281,7 +281,7 @@ var sendDevicePushNotification = function (req, res, next) { return __awaiter(vo
                     },
                     token: fcmToken,
                 };
-                return [4 /*yield*/, firebase_1.sendToSubscriptions(message)];
+                return [4 /*yield*/, (0, firebase_1.sendToSubscriptions)(message)];
             case 1:
                 _a.sent();
                 res.send({});

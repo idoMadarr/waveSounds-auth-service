@@ -30,6 +30,6 @@ var userSchema = new mongoose_1.Schema({
 userSchema.statics.build = function (credentials) {
     return new exports.User(credentials);
 };
-userSchema.statics.toHash = function (password) { return bcryptjs_1.hash(password, 12); };
-userSchema.statics.toCompare = function (inputPassword, storedPassword) { return bcryptjs_1.compare(inputPassword, storedPassword); };
-exports.User = mongoose_1.model('User', userSchema);
+userSchema.statics.toHash = function (password) { return (0, bcryptjs_1.hash)(password, 12); };
+userSchema.statics.toCompare = function (inputPassword, storedPassword) { return (0, bcryptjs_1.compare)(inputPassword, storedPassword); };
+exports.User = (0, mongoose_1.model)('User', userSchema);

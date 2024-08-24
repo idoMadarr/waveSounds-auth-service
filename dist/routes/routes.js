@@ -6,13 +6,13 @@ var express_validator_1 = require("express-validator");
 var controller_1 = require("../controller/controller");
 var validation_middleware_1 = require("../middlewares/validation-middleware");
 var auth_middleware_1 = require("../middlewares/auth-middleware");
-var route = express_1.Router();
+var route = (0, express_1.Router)();
 exports.authRoutes = route;
 //  http://localhost:4000/ws-api/signup
 route.post('/signup', [
-    express_validator_1.body('email').isEmail().withMessage('Valid email is required'),
-    express_validator_1.body('username').notEmpty().withMessage('Username is required'),
-    express_validator_1.body('password')
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid email is required'),
+    (0, express_validator_1.body)('username').notEmpty().withMessage('Username is required'),
+    (0, express_validator_1.body)('password')
         .trim()
         .isLength({ min: 4, max: 9 })
         .withMessage('Valid password is required'),
@@ -20,14 +20,14 @@ route.post('/signup', [
 ], controller_1.signUp);
 //  http://localhost:4000/ws-api/signin
 route.post('/signin', [
-    express_validator_1.body('email').isEmail().withMessage('Valid Email must be supply'),
-    express_validator_1.body('password').trim().notEmpty().withMessage('Password must be supply'),
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid Email must be supply'),
+    (0, express_validator_1.body)('password').trim().notEmpty().withMessage('Password must be supply'),
     validation_middleware_1.validationMiddleware,
 ], controller_1.signIn);
 // http://localhost:4000/ws-api/google-oauth
 route.post('/google-oauth', [
-    express_validator_1.body('email').isEmail().withMessage('Valid Email must be supply'),
-    express_validator_1.body('username').notEmpty().withMessage('Username must be supply'),
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid Email must be supply'),
+    (0, express_validator_1.body)('username').notEmpty().withMessage('Username must be supply'),
     validation_middleware_1.validationMiddleware,
 ], controller_1.googleOAuth);
 // http://localhost:4000/ws-api/favorites
@@ -35,16 +35,16 @@ route.get('/favorites', auth_middleware_1.authMiddleware, controller_1.getFavori
 //  http://localhost:4000/ws-api/add-favorite
 route.post('/add-favorite', [
     auth_middleware_1.authMiddleware,
-    express_validator_1.body('title').notEmpty().withMessage('Title must be supplied'),
-    express_validator_1.body('artist').notEmpty().withMessage('Artist must be supplied'),
-    express_validator_1.body('image').notEmpty().withMessage('Image must be supplied'),
-    express_validator_1.body('preview').notEmpty().withMessage('Preview must be supplied'),
+    (0, express_validator_1.body)('title').notEmpty().withMessage('Title must be supplied'),
+    (0, express_validator_1.body)('artist').notEmpty().withMessage('Artist must be supplied'),
+    (0, express_validator_1.body)('image').notEmpty().withMessage('Image must be supplied'),
+    (0, express_validator_1.body)('preview').notEmpty().withMessage('Preview must be supplied'),
     validation_middleware_1.validationMiddleware,
 ], controller_1.addFavorite);
 //  http://localhost:4000/ws-api/remove-favorite/:id
 route.delete('/remove-favorite/:id', [
     auth_middleware_1.authMiddleware,
-    express_validator_1.param('id').exists().withMessage('Track ID is required'),
+    (0, express_validator_1.param)('id').exists().withMessage('Track ID is required'),
     validation_middleware_1.validationMiddleware,
 ], controller_1.removeFavorites);
 //  http://localhost:4000/ws-api/signout

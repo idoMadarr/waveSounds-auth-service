@@ -8,7 +8,7 @@ var authMiddleware = function (req, _res, next) {
         throw new unauthorized_error_1.UnauthorizedError();
     }
     try {
-        var decoded = jsonwebtoken_1.verify(req.session.userJwt, process.env.JWT_KEY);
+        var decoded = (0, jsonwebtoken_1.verify)(req.session.userJwt, process.env.JWT_KEY);
         req.currentUser = decoded;
     }
     catch (error) {

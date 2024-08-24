@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -33,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -69,9 +73,9 @@ var routes_1 = require("./routes/routes");
 var dotenv = __importStar(require("dotenv"));
 require("./services/redis");
 dotenv.config();
-var app = express_1.default();
+var app = (0, express_1.default)();
 app.use(express_1.default.json());
-app.use(cookie_session_1.default({
+app.use((0, cookie_session_1.default)({
     signed: false,
 }));
 app.use('/ws-api', routes_1.authRoutes);
@@ -84,7 +88,7 @@ app.use(error_middleware_1.errorMiddleware);
 var initServer = function () {
     mongoose_1.default.connect(process.env.MONGO_URI, function () {
         var server = app.listen(process.env.PORT, function () {
-            console.log("Server started on port " + process.env.PORT);
+            console.log("Server started on port ".concat(process.env.PORT));
             socketIO_1.default.socketInit(server);
         });
     });
