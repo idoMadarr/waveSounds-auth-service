@@ -22,7 +22,7 @@ interface FavoriteRepo {
   title: string;
   artist: string;
   image: string;
-  preview: string;
+  url: string;
 }
 
 const favoriteSchema = new Schema(

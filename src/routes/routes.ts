@@ -65,7 +65,7 @@ route.post(
     body('title').notEmpty().withMessage('Title must be supplied'),
     body('artist').notEmpty().withMessage('Artist must be supplied'),
     body('image').notEmpty().withMessage('Image must be supplied'),
-    body('preview').notEmpty().withMessage('Preview must be supplied'),
+    body('url').notEmpty().withMessage('Url must be supplied'),
     validationMiddleware,
   ],
   addFavorite

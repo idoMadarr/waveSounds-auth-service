@@ -38,7 +38,7 @@ route.post('/add-favorite', [
     (0, express_validator_1.body)('title').notEmpty().withMessage('Title must be supplied'),
     (0, express_validator_1.body)('artist').notEmpty().withMessage('Artist must be supplied'),
     (0, express_validator_1.body)('image').notEmpty().withMessage('Image must be supplied'),
-    (0, express_validator_1.body)('preview').notEmpty().withMessage('Preview must be supplied'),
+    (0, express_validator_1.body)('url').notEmpty().withMessage('Url must be supplied'),
     validation_middleware_1.validationMiddleware,
 ], controller_1.addFavorite);
 //  http://localhost:4000/ws-api/remove-favorite/:id
